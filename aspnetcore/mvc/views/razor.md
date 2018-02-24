@@ -10,89 +10,89 @@ ms.technology: aspnet
 ms.topic: article
 uid: mvc/views/razor
 ---
-# Razor syntax for ASP.NET Core
+# ASP.NET Core 的 Razor 语法
 
 By [Rick Anderson](https://twitter.com/RickAndMSFT), [Luke Latham](https://github.com/guardrex), [Taylor Mullen](https://twitter.com/ntaylormullen), and [Dan Vicarel](https://github.com/Rabadash8820)
 
-Razor is a markup syntax for embedding server-based code into webpages. The Razor syntax consists of Razor markup, C#, and HTML. Files containing Razor generally have a *.cshtml* file extension.
+Razor是一种在web页面中嵌入服务器端代码的标记语言。Razor语法由Razor标记，C#和HTML组成。包含Razor的文件一般以 *.cshtml* 为扩展名。
 
-## Rendering HTML
+## HTML渲染
 
-The default Razor language is HTML. Rendering HTML from Razor markup is no different than rendering HTML from an HTML file. HTML markup in *.cshtml* Razor files is rendered by the server unchanged.
+Razor 的默认语言是HTML。渲染Razor标记和渲染HTML文件中的HTML是一样的。 *.cshtml* Razor 文件中的HTML标记由服务器原样渲染。
 
-## Razor syntax
+## Razor 语法
 
-Razor supports C# and uses the `@` symbol to transition from HTML to C#. Razor evaluates C# expressions and renders them in the HTML output.
+Razor支持C#并使用`@`符号从HTML转换到C#。Razor运算并在HTML输出中渲染C#表达式。
 
-When an `@` symbol is followed by a [Razor reserved keyword](#razor-reserved-keywords), it transitions into Razor-specific markup. Otherwise, it transitions into plain C#.
+当一个`@`符号后面跟随 [Razor 保留关键字](#razor-reserved-keywords) 时，标记被转换为特定Razor标记。如果`@`后跟随的不是Razor保留关键字，标记被转换为纯C#。
 
-To escape an `@` symbol in Razor markup, use a second `@` symbol:
+在Razor标记中转义`@`符可以使用两个`@`：
 
 ```cshtml
 <p>@@Username</p>
 ```
 
-The code is rendered in HTML with a single `@` symbol:
+以上代码被渲染为单个`@`符号：
 
 ```html
 <p>@Username</p>
 ```
 
-HTML attributes and content containing email addresses don't treat the `@` symbol as a transition character. The email addresses in the following example are untouched by Razor parsing:
+HTML属性和内容中email地址包含的`@`符号不被视为Razor转换字符。Razor解析时不会修改下面例子中的email地址：
 
 ```cshtml
 <a href="mailto:Support@contoso.com">Support@contoso.com</a>
 ```
 
-## Implicit Razor expressions
+## 隐式 Razor 表达式
 
-Implicit Razor expressions start with `@` followed by C# code:
+`@`后面跟随C#代码构成隐式Razor表达式：
 
 ```cshtml
 <p>@DateTime.Now</p>
 <p>@DateTime.IsLeapYear(2016)</p>
 ```
 
-With the exception of the C# `await` keyword, implicit expressions must not contain spaces. If the C# statement has a clear ending, spaces can be intermingled:
+除了C#的`await`关键字，隐式表达式一定不能包含空格。如果C#语句有明确的结尾，语句中间可以有空格：
 
 ```cshtml
 <p>@await DoSomething("hello", "world")</p>
 ```
 
-Implicit expressions **cannot** contain C# generics, as the characters inside the brackets (`<>`) are interpreted as an HTML tag. The following code is **not** valid:
+隐式表达式 **不能** 包含C#泛型，因为在(`<>`)括号中的字符被解释为HTML标签。下面的代码是 **无效** 的：
 
 ```cshtml
 <p>@GenericMethod<int>()</p>
 ```
 
-The preceding code generates a compiler error similar to one of the following:
+上面的代码会产生类似如下的编译错误：
 
  * The "int" element wasn't closed. All elements must be either self-closing or have a matching end tag.
- *  Cannot convert method group 'GenericMethod' to non-delegate type 'object'. Did you intend to invoke the method?` 
- 
-Generic method calls must be wrapped in an [explicit Razor expression](#explicit-razor-expressions) or a [Razor code block](#razor-code-blocks).
+ *  Cannot convert method group 'GenericMethod' to non-delegate type 'object'. Did you intend to invoke the method?
 
-## Explicit Razor expressions
+泛型方法必须在 [显式 Razor 表达式](#显式 Razor 表达式) 或者 [Razor 代码块](#razor-code-blocks) 中调用。
 
-Explicit Razor expressions consist of an `@` symbol with balanced parenthesis. To render last week's time, the following Razor markup is used:
+## 显式 Razor 表达式
+
+Razor显式表达式由`@`和配对的小括号组成。如，要渲染上周此时的时间可以使用下面的Razor标记：
 
 ```cshtml
 <p>Last week this time: @(DateTime.Now - TimeSpan.FromDays(7))</p>
 ```
 
-Any content within the `@()` parenthesis is evaluated and rendered to the output.
+在`@()`中插入的任何内容都会被计算并渲染到输出。
 
-Implicit expressions, described in the previous section, generally can't contain spaces. In the following code, one week isn't subtracted from the current time:
+前面章节描述的隐式表达式一般不能包含空格。如下代码不是从当前时间减去1周：
 
 [!code-cshtml[Main](razor/sample/Views/Home/Contact.cshtml?range=17)]
 
-The code renders the following HTML:
+代码被渲染为如下HTML：
 
 ```html
 <p>Last week: 7/7/2016 4:39:52 PM - TimeSpan.FromDays(7)</p>
 ```
 
-Explicit expressions can be used to concatenate text with an expression result:
+显式表达式可以用文本和表达式的结果串接：
 
 ```cshtml
 @{
@@ -102,62 +102,62 @@ Explicit expressions can be used to concatenate text with an expression result:
 <p>Age@(joe.Age)</p>
 ```
 
-Without the explicit expression, `<p>Age@joe.Age</p>` is treated as an email address, and `<p>Age@joe.Age</p>` is rendered. When written as an explicit expression, `<p>Age33</p>` is rendered.
+如果不用显式表达式，`<p>Age@joe.Age</p>`被视为一个email地址，会被渲染成 `<p>Age@joe.Age</p>`。而写成显式表达式会被渲染成`<p>Age33</p>`。
 
 
-Explicit expressions can be used to render output from generic methods in *.cshtml* files. In an implicit expression, the characters inside the brackets (`<>`) are interpreted as an HTML tag. The following markup is **not** valid Razor:
+显式表达式可以用来将 *.cshtml* 文件中的泛型方法渲染输出。在隐式表达式中，括号(`<>`)中的字符被解释为HTML标签。下面的标记是 **无效的** Razor：
 
 ```cshtml
 <p>@GenericMethod<int>()</p>
 ```
 
-The preceding code generates a compiler error similar to one of the following:
+上面的代码会产生类似如下的编译错误：
 
  * The "int" element wasn't closed. All elements must be either self-closing or have a matching end tag.
- *  Cannot convert method group 'GenericMethod' to non-delegate type 'object'. Did you intend to invoke the method?` 
+ *  Cannot convert method group 'GenericMethod' to non-delegate type 'object'. Did you intend to invoke the method?
  
- The following markup shows the correct way write this code. The code is written as an explicit expression:
+ 下面的代码用显式表达式示例正确的实现方法：
 
 ```cshtml
 <p>@(GenericMethod<int>())</p>
 ```
 
-## Expression encoding
+## 表达式编码
 
-C# expressions that evaluate to a string are HTML encoded. C# expressions that evaluate to `IHtmlContent` are rendered directly through `IHtmlContent.WriteTo`. C# expressions that don't evaluate to `IHtmlContent` are converted to a string by `ToString` and encoded before they're rendered.
+鉴定为字符串的C#表达式被HTML编码。鉴定为`IHtmlContent`的C#表达式通过`IHtmlContent.WriteTo`被直接渲染。没有被鉴定为`IHtmlContent` 的C#表达式由`ToString`转换为字符串并在渲染前编码。
 
 ```cshtml
 @("<span>Hello World</span>")
 ```
 
-The code renders the following HTML:
+代码被渲染为如下HTML:
 
 ```html
 &lt;span&gt;Hello World&lt;/span&gt;
 ```
 
-The HTML is shown in the browser as:
+HTML在浏览器中显示为：
 
 ```
 <span>Hello World</span>
 ```
 
-`HtmlHelper.Raw` output isn't encoded but rendered as HTML markup.
+`HtmlHelper.Raw` 输出不被编码而是渲染为HTML标记。
 
-> [!WARNING]
-> Using `HtmlHelper.Raw` on unsanitized user input is a security risk. User input might contain malicious JavaScript or other exploits. Sanitizing user input is difficult. Avoid using `HtmlHelper.Raw` with user input.
+> [!注意]
+> 对未消毒的用户输入使用`HtmlHelper.Raw`有安全风险。用户的输入可能包含恶意Javascript或其它攻击。对用户的输入消毒是困难的。避免对用的户输入使用`HtmlHelper.Raw`。
 
 ```cshtml
 @Html.Raw("<span>Hello World</span>")
 ```
 
-The code renders the following HTML:
+代码渲染的HTML：
 
 ```html
 <span>Hello World</span>
 ```
 
-## Razor code blocks
+## Razor 代码块
 
 Razor code blocks start with `@` and are enclosed by `{}`. Unlike expressions, C# code inside code blocks isn't rendered. Code blocks and expressions in a view share the same scope and are defined in order:
 
